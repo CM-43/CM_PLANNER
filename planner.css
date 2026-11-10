@@ -1,0 +1,300 @@
+/* ==========================================================================
+   planner.css — the Study Planner's own styles (round 3, plan D49)
+
+   Loaded after shared-styles.css (the house stylesheet, v1.8, copied
+   unchanged). Colours, sizes and spacing come from its variables; the only
+   new names are the phase colours below, each taken from its palette.
+   ========================================================================== */
+
+:root {
+  /* Phase colours (day strip, day-card stripes, legend). Each is a house
+     colour; as shapes on the light card each has at least 3 : 1 contrast. */
+  --ph-learn:    var(--accent);        /* blue  */
+  --ph-practise: var(--success);       /* green */
+  --ph-mock:     var(--warning);       /* amber */
+  --ph-review:   var(--header-bg);     /* slate: review and fix days */
+  --ph-free:     var(--surface-line);  /* pale grey */
+  --ph-test:     var(--on-light-muted);/* dark grey: course lessons on the test day */
+}
+
+/* This page is a form, not a game: it scrolls inside the course frame, and
+   it has no "window too small" screen. */
+html, body { height: auto; min-height: 100%; }
+body.planner-page { overflow-x: hidden; overflow-y: auto; }
+
+.planner {
+  width: min(860px, 100%);
+  margin: 0 auto;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;                     /* at least 16 px between all cards (round 2 fix 1) */
+}
+/* the plan's cards stack with the same 16 px gap */
+#pl-result { display: flex; flex-direction: column; gap: 16px; }
+#pl-result:empty { display: none; }
+/* Screen 1 (and the messages): the one card sits in the middle of the frame. */
+.planner.is-centred { min-height: 100vh; justify-content: center; }
+
+.pl-card {
+  background: var(--surface);
+  color: var(--on-light);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 10px 28px rgba(0, 0, 0, 0.3);
+  padding: var(--space-5) 22px;
+}
+.pl-card h1 { font-size: clamp(20px, 2vw, 26px); line-height: 1.25; }
+.pl-card p { margin: 0; }
+.pl-intro { color: var(--on-light-muted); font-size: max(14px, 0.92em); margin: 4px 0 var(--space-5) !important; }
+
+/* ---------- screen 1: the form ---------- */
+.pl-form-card { width: min(680px, 100%); margin: 0 auto; }
+.pl-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+.pl-step {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 13em) minmax(0, 1fr);
+  column-gap: var(--space-3);
+  align-items: start;
+}
+.pl-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent-dark);
+  font-weight: 700; font-size: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-top: 8px;
+}
+.pl-step-label { font-weight: 600; font-size: max(14px, 0.92em); padding-top: 10px; }
+.pl-step-control { min-width: 0; }
+.pl-step-control input[type="date"] {
+  width: min(100%, 220px);
+  min-height: 42px;
+  padding: 8px var(--space-3);
+  font: inherit;
+  font-size: max(14px, 0.92em);
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-small);
+  background: var(--surface-plain);
+  color: var(--on-light);
+}
+.pl-hint { color: var(--on-light-muted); font-size: max(13px, 0.84em); margin-top: 4px !important; }
+.pl-hint:empty { display: none; }
+.pl-field-error { color: #b91c1c; font-size: max(13px, 0.84em); font-weight: 600; margin-top: 4px !important; }
+.pl-field-error:empty { display: none; }
+
+/* the hours box: − [ 2 ] + h */
+.pl-stepper { display: inline-flex; align-items: center; gap: var(--space-2); }
+.pl-stepper input {
+  width: 72px; min-height: 42px; text-align: center;
+  font: inherit; font-size: max(15px, 0.95em); font-weight: 600;
+  border: 1px solid var(--surface-line); border-radius: var(--radius-small);
+  background: var(--surface-plain); color: var(--on-light);
+  -moz-appearance: textfield; appearance: textfield;
+}
+.pl-stepper input::-webkit-outer-spin-button,
+.pl-stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.pl-step-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--surface-line); background: var(--surface-plain); color: var(--accent-dark);
+  font: inherit; font-size: 22px; font-weight: 600; line-height: 1; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.pl-step-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+.pl-suffix { font-weight: 600; color: var(--on-light-muted); }
+
+/* the three game buttons (radio buttons underneath: arrow keys work) */
+.pl-games { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
+.pl-game { position: relative; display: block; cursor: pointer; }
+.pl-game input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.pl-game span {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  min-height: 46px; padding: 8px 10px;
+  border: 1px solid var(--surface-line); border-radius: var(--radius-small);
+  background: var(--surface-plain); font-weight: 600; font-size: max(14px, 0.92em);
+}
+.pl-game:hover span { border-color: var(--accent); }
+.pl-game input:checked + span { border: 2px solid var(--accent); background: var(--accent-soft); color: var(--accent-dark); padding: 7px 9px; }
+
+.pl-submit { margin-top: var(--space-5); display: flex; justify-content: flex-end; }
+
+/* focus rings on the light card (the house white ring would vanish) */
+.pl-card :focus-visible, .pl-card .btn:focus-visible, .pl-card .btn-quiet:focus-visible {
+  outline: 2px solid var(--accent-dark); outline-offset: 2px;
+}
+.pl-game input:focus-visible + span { outline: 2px solid var(--accent-dark); outline-offset: 2px; }
+.pl-card .btn-quiet { color: var(--on-light); border-color: var(--surface-line); background: var(--surface-plain); }
+.pl-card .btn-quiet:hover { background: var(--surface-sunken); }
+
+/* after the plan is made: the form folds into one line */
+.pl-summary-line { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 10px 18px; }
+.pl-summary-line p { font-size: max(14px, 0.92em); }
+
+/* ---------- screen 2: the plan ---------- */
+.pl-plan-head h2 { font-size: max(16px, 1.02em); line-height: 1.4; outline: none; margin-bottom: var(--space-3); }
+.pl-sumline { font-size: max(14px, 0.9em); color: #3d4757; margin-bottom: var(--space-2) !important; }
+.pl-sumline:last-of-type { margin-bottom: var(--space-4) !important; }
+.pl-lead { font-size: max(15px, 0.98em); }
+
+.pl-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); }
+.pl-tile { background: var(--surface-plain); border: 1px solid var(--surface-line); border-radius: var(--radius); padding: 10px 14px; }
+.pl-tile-label { font-size: max(12px, 0.78em); font-weight: 600; color: var(--on-light-muted); }
+.pl-tile-value { font-size: clamp(18px, 1.8vw, 24px); font-weight: 700; line-height: 1.2; margin-top: 2px !important; }
+.pl-tile-value.is-words { font-size: max(15px, 1em); line-height: 1.3; margin-top: 6px !important; }
+.pl-tile-sub { font-size: max(12px, 0.8em); color: var(--on-light-muted); }
+
+.pl-notices { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+.pl-notice { font-size: max(14px, 0.9em); color: #3d4757; }
+.pl-notice.is-amber {
+  background: var(--warning-soft); color: #7c4a03; border: 1px solid var(--warning);
+  border-radius: var(--radius-small); padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap;
+}
+.pl-notice.is-amber .btn-quiet { border-color: #b45309; color: #7c4a03; background: #fff; }
+/* the "very poor plan" notice (§3): the strongest message on the page */
+.pl-notice.is-strong {
+  background: #fef2f2; color: #7f1d1d; border: 2px solid var(--error);
+  border-radius: var(--radius-small); padding: 12px 14px; font-weight: 600;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap;
+}
+.pl-notice.is-strong p { flex: 1 1 22em; }
+.pl-notice.is-strong .btn { background: var(--error); }
+.pl-notice.is-strong .btn:hover { background: #b91c1c; }
+.pl-link-btn {
+  background: none; border: none; padding: 0; font: inherit; color: var(--accent-dark);
+  text-decoration: underline; cursor: pointer;
+}
+
+/* the day strip */
+.pl-strip-wrap { margin-top: 16px; }
+.pl-strip { display: flex; flex-wrap: wrap; gap: 4px; }
+.pl-sq {
+  width: 32px; height: 32px; border-radius: 6px; border: none; cursor: pointer; padding: 0;
+  font: inherit; font-size: 12px; font-weight: 700; color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.pl-sq:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
+.pl-sq.phase-free { color: var(--on-light-muted); }
+.pl-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: var(--space-2) !important; font-size: max(12px, 0.8em); color: var(--on-light-muted); }
+.pl-legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.pl-legend-item i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+/* phase colours: squares, legend swatches, card stripes */
+.phase-learn { --ph: var(--ph-learn); }
+.phase-mixed { --ph: var(--ph-practise); }
+.phase-practise { --ph: var(--ph-practise); }
+.phase-mock { --ph: var(--ph-mock); }
+.phase-review, .phase-fix { --ph: var(--ph-review); }
+.phase-free { --ph: var(--ph-free); }
+.phase-test { --ph: var(--ph-test); }
+.pl-sq, .pl-legend-item i { background: var(--ph); }
+.pl-sq.phase-mixed { background: linear-gradient(135deg, var(--ph-learn) 50%, var(--ph-practise) 50%); }
+
+.pl-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin-top: var(--space-4); }
+.pl-tab-link { font-size: max(13px, 0.86em); color: var(--accent-dark); }
+.pl-said { font-size: max(13px, 0.86em); color: var(--success); }
+
+/* one column of day cards with clear space between them */
+.pl-days { display: flex; flex-direction: column; gap: 16px; }
+.pl-day {
+  background: var(--surface-plain); color: var(--on-light);
+  border-radius: var(--radius);
+  border-left: 6px solid var(--ph);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.18);
+  padding: 12px 18px 10px;
+  scroll-margin-top: 12px;
+  outline: none;
+}
+.pl-day:focus-visible { box-shadow: 0 0 0 3px var(--accent); }
+.pl-day-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); flex-wrap: wrap; }
+.pl-day-head h3 { font-size: max(15px, 0.98em); }
+.pl-day-date { font-weight: 500; color: var(--on-light-muted); margin-left: 6px; }
+.pl-day-meta { display: inline-flex; gap: var(--space-3); font-size: max(13px, 0.84em); color: var(--on-light-muted); }
+.pl-day-phase { font-weight: 700; color: var(--on-light); }
+.pl-day-note {
+  margin-top: var(--space-2) !important; font-size: max(13px, 0.86em);
+  background: var(--surface); border-radius: var(--radius-small); padding: 6px 10px; color: #3d4757;
+}
+.pl-day-note.is-amber { background: var(--warning-soft); color: #7c4a03; border: 1px solid var(--warning); font-weight: 600; }
+
+/* the parts of a day (§3): a header over the lessons, the practice, the Mock Test, the review */
+.pl-block { margin-top: var(--space-3); }
+.pl-block-head {
+  font-size: max(13px, 0.84em); font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase;
+  color: var(--on-light-muted); padding-bottom: 4px; border-bottom: 2px solid var(--surface-line);
+}
+.pl-block-lessons .pl-block-head { color: var(--accent-dark); border-bottom-color: var(--accent-soft); }
+.pl-block-practice .pl-block-head { color: var(--success); }
+.pl-block-mock .pl-block-head { color: #92400e; }
+.pl-section { font-size: max(12px, 0.8em); font-weight: 600; color: var(--on-light-muted); margin-top: var(--space-2) !important; }
+
+.pl-rows { list-style: none; margin: var(--space-2) 0 0; padding: 0; }
+.pl-row {
+  display: flex; align-items: baseline; gap: var(--space-2);
+  font-size: max(14px, 0.9em); line-height: 1.35;
+}
+.pl-row { padding: 7px 0; border-top: 1px solid var(--surface-line); }
+.pl-row:first-child { border-top: 0; }
+.pl-row-title { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.pl-row-title a { color: var(--accent-dark); }
+.pl-row-min { flex: 0 0 auto; white-space: nowrap; color: var(--on-light-muted); font-size: max(13px, 0.86em); font-variant-numeric: tabular-nums; }
+.pl-ico { flex: 0 0 auto; width: 16px; height: 16px; color: var(--on-light-muted); position: relative; top: 2px; }
+.pl-row.is-practice .pl-ico { color: var(--ph-practise); }
+.pl-row.is-key { font-weight: 700; }
+.pl-row.is-key .pl-ico { color: var(--ph); }
+
+.pl-free-run {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px var(--space-3);
+  padding: 8px 18px; border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.06); border: 1px dashed var(--box-border); color: var(--on-dark);
+  font-size: max(13px, 0.88em); scroll-margin-top: 12px; outline: none;
+}
+.pl-free-run:focus-visible { outline: 2px solid #fff; }
+.pl-free-label { font-weight: 700; }
+.pl-free-dates, .pl-free-text { color: var(--on-dark-muted); }
+
+.pl-free-text { flex-basis: 100%; }
+
+/* "Missing from your plan" and "If you find spare time" (§3) */
+.pl-missing { border: 2px solid var(--warning); }
+.pl-missing.is-strong { border-color: var(--error); }
+.pl-missing h3, .pl-spare h3 { font-size: max(15px, 0.98em); }
+.pl-missing-hours { font-size: max(14px, 0.9em); color: #3d4757; margin-top: 4px !important; }
+.pl-missing .pl-rows, .pl-spare .pl-rows { margin-top: var(--space-2); }
+.pl-spare .pl-spare-head { margin-top: var(--space-4) !important; }   /* "Practice games not in your plan", "Redrock PDF answers …" */
+
+/* ---------- messages: blocked, map errors ---------- */
+.pl-message { width: min(680px, 100%); margin: 0 auto; }
+.pl-message p { color: var(--on-light-muted); margin-top: var(--space-2) !important; }
+.pl-errors { margin: var(--space-3) 0 0; padding-left: 20px; color: #b91c1c; font-size: max(13px, 0.88em); }
+.pl-errors li { margin-bottom: 3px; }
+
+/* ---------- small frames (851 x 479 with the course sidebar open) ---------- */
+@media (max-width: 760px) {
+  .pl-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .pl-step { grid-template-columns: 28px minmax(0, 1fr); }
+  .pl-step-control { grid-column: 2; margin-top: 6px; }
+  .pl-step-label { padding-top: 6px; }
+}
+@media (max-height: 560px) {
+  .planner { padding: var(--space-3); }
+  .pl-card { padding: var(--space-4) var(--space-5); }
+  .pl-intro { margin-bottom: var(--space-3) !important; }
+  .pl-steps { gap: var(--space-3); }
+  .pl-submit { margin-top: var(--space-3); }
+}
+
+/* ---------- printing: the plan only, every group open, white ---------- */
+@media print {
+  html, body, body.planner-page { background: #fff !important; color: #000; overflow: visible; height: auto; }
+  .pl-form-card, .pl-summary-line, .pl-actions, .pl-strip-wrap,
+  .pl-notice button, .pl-missing button { display: none !important; }
+  .planner, .planner.is-centred { width: auto; min-height: 0; padding: 0; gap: 8px; }
+  .pl-card { box-shadow: none; border: 1px solid #bbb; padding: 10px 14px; }
+  .pl-day { box-shadow: none; border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px solid #bbb; break-inside: avoid; }
+  .pl-free-run { color: #000; border-color: #999; background: #fff; }
+  .pl-free-dates, .pl-free-text { color: #333; }
+  .pl-block { break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+  .pl-row-title a[href]::after { content: " (" attr(href) ")"; font-size: 9pt; font-weight: 400; color: #444; overflow-wrap: anywhere; }
+}

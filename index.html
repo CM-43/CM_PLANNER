@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your study plan</title>
+<!--
+  index.html — the Study Planner page.
+
+  The candidate gives three things (test date, hours a day, the game that
+  worries them most) and gets a day-by-day plan through the package —
+  learn, practise, Mock Test, review, fix — which they can print or add to
+  their calendar. Nothing is saved in the browser: the plan is rebuilt
+  from the three answers every time.
+
+  Address: https://cm-43.github.io/CM_PLANNER/ (repository CM_PLANNER).
+
+  The plan is built from content-map.js (WK edits that file, not the code).
+  config.js says where the page is allowed to run.
+-->
+<link rel="stylesheet" href="shared-styles.css">
+<link rel="stylesheet" href="planner.css">
+</head>
+<body class="planner-page">
+
+<!-- The form, the plan and the messages are drawn here by planner.js. -->
+<main id="planner" class="planner">
+  <noscript><section class="pl-card"><h1>Please turn on JavaScript</h1><p>The Study Planner needs JavaScript to make your plan.</p></section></noscript>
+</main>
+
+<script src="config.js"></script>
+<script src="content-map.js"></script>
+<script src="planner.js"></script>
+</body>
+</html>
