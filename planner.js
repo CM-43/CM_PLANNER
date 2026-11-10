@@ -72,6 +72,7 @@
 
   /* Every line the candidate reads (brief §3; very simple English). */
   var TEXT = {
+    planTitle: 'Your study plan',   /* fix round 5: the top card's title */
     testToday: 'Your test is today. Good luck — there is no time left to plan.',
     pastDate: 'Choose a date from today on.',
     startNow: 'This plan assumes you are starting the course now. Already done some lessons? Skip them and use the time for practice.',
@@ -957,6 +958,14 @@
       ', up to ' + hoursText(plan.hoursPerDay) + ' a day, test on ' + testText +
       '. Game you chose: ' + gameLabel(plan.weakGame) + '.';
   }
+  /* fix round 5: the rows under the plan's title on the page */
+  function headFacts(plan) {
+    return [
+      { label: 'Test date', value: formatDate(plan.testDate, plan.today.y) },
+      { label: 'Hours a day', value: 'Up to ' + hoursText(plan.hoursPerDay) },
+      { label: 'Game you chose', value: gameLabel(plan.weakGame) }
+    ];
+  }
   function tiles(plan) {
     var ld = plan.lessonsEndDay ? plan.days[plan.lessonsEndDay - 1] : null;
     var md = plan.mockDay ? plan.days[plan.mockDay - 1] : null;
@@ -1126,7 +1135,7 @@
 
   var Planner = {
     validateMap: validateMap, buildPlan: buildPlan, hoursNeeded: hoursNeeded, buildIcs: buildIcs, icsSummary: icsSummary,
-    planToText: planToText, headingText: headingText, tiles: tiles, prepare: prepare, playOrder: playOrder,
+    planToText: planToText, headingText: headingText, headFacts: headFacts, tiles: tiles, prepare: prepare, playOrder: playOrder,
     layout: layout, tryLayout: tryLayout, practiceBeforeMock: practiceBeforeMock, courseFits: courseFits, eligible: eligible, dayBlocks: dayBlocks, dayTopNotes: dayTopNotes,
     groupOf: groupOf, isLessonItem: isLessonItem, isPracticeItem: isPracticeItem, missingHoursText: missingHoursText, dayHeadText: dayHeadText, spareGroups: spareGroups, spareTitle: spareTitle,
     formatDate: formatDate, formatMinutes: formatMinutes, parseDate: parseDate, isoDate: isoDate,
@@ -1387,8 +1396,15 @@
         }).join('') +
       '</section>';
 
+    /* fix round 5 (WK, Step 6): the one-line heading split into a short title and three rows
+       (test date, hours a day, game). The study days are in the first tile just below.
+       headingText() stays the plain-text form for planToText and the checks. */
+    var facts = headFacts(plan).map(function (f) {
+      return '<div class="pl-fact"><dt>' + esc(f.label) + '</dt><dd>' + esc(f.value) + '</dd></div>';
+    }).join('');
     return '<section class="pl-card pl-plan-head">' +
-        '<h2 id="pl-heading" tabindex="-1">' + esc(headingText(plan)) + '</h2>' +
+        '<h2 id="pl-heading" tabindex="-1">' + esc(TEXT.planTitle) + '</h2>' +
+        '<dl class="pl-facts">' + facts + '</dl>' +
         sumLines +
         '<div class="pl-tiles">' + tiles(plan).map(tileHtml).join('') + '</div>' +
         (notices.length ? '<div class="pl-notices">' + notices.map(noticeHtml).join('') + '</div>' : '') +
